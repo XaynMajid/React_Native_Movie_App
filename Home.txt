@@ -1,0 +1,96 @@
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, View ,Image, TextInput, TouchableOpacity} from 'react-native';
+import tw from 'twrnc';
+import LatestMovies from '../component/TrendingMovies';
+import Icon from 'react-native-vector-icons/Feather'
+import FontAwsome from 'react-native-vector-icons/FontAwesome'
+import MovieList from '../component/MovieList';
+import { ScrollView,GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
+import Loading from '../component/loading';
+import { fetchTrendingMovies } from '../../api/moviesdb';
+import Cast from '../component/Cast';
+
+const HomeScreen = ({navigation}) => {
+     const [loading,setLoading]=useState(true)
+     const [trending,setTrending]=useState([1,2,3,4])
+     const [upcoming,setUpcoming]=useState([1,2,3,4])
+     const [topRated,settopRated]=useState([1,2,3,4])
+    const [cast, setCast] = useState([1, 2, 3, 4, 5]);
+
+     navigation=useNavigation()
+     const handleClick=()=>{
+          navigation.navigate("Search")
+     }
+     useEffect(() => {
+          getTrendingMovies()
+     }, [trending]);   // when the trending values changes then it updates your page with the value
+     
+     const getTrendingMovies = async () => {
+          try {
+              const res = await fetchTrendingMovies();
+          //     console.log("This is the trending movies data", res.data.results);
+              if (res && res.data.results){
+               setTrending(res.data.results);
+              }
+          
+          } catch (error) {
+              console.log("Error fetching trending movies:", error);
+          }
+          setLoading(false)
+          // console.log(trending);
+      };
+      
+
+
+
+
+
+
+
+
+
+  return (
+      
+<GestureHandlerRootView>
+<ScrollView showsVerticalScrollIndicator={false}>      
+
+<View style={tw`bg-gray-800 flex-1`}>
+<View style={tw`flex-row justify-between h-10 mx-4 mt-2 `}>
+     <Icon name="menu"  size={30}/>
+     <Text style={tw`text-yellow-500 text-3xl`}>M
+      <Text style={tw`text-white`}>ovies</Text>
+     </Text>
+<TouchableOpacity onPress={()=>handleClick()
+}>
+     <FontAwsome name='search'  size={30}/>
+     </TouchableOpacity>
+    </View>
+
+{
+     loading?(
+          <Loading search={false}/>
+     ):(
+     <View>
+          <LatestMovies title="Trending" navigation={navigation}  data={trending} />
+          <MovieList title="Upcoming " hideSeeAll={false} />
+          <MovieList title="Top Rated" hideSeeAll={false} />
+      </View>
+          
+     )
+     
+}
+
+  {/* <UpcomingMovies title="Upcoming " /> */}
+
+  </View> 
+  </ScrollView>                   
+  </GestureHandlerRootView>
+
+)}
+  
+     //your full app may not scroll. for this you have to put both of these tags
+
+const styles = StyleSheet.create({})
+
+export default HomeScreen;
